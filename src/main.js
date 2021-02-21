@@ -267,7 +267,7 @@ function fillProfileInfo(profile) {
     comments.innerText = `Комментариев: ${profile.counters.comments}`;
 }
 
-export function onClicked() {
+async function getInfo(site, id, profile) {
     const totalCommentsText          = document.getElementById('card-comments-progress-total');
     const countedCommentsText        = document.getElementById('card-comments-progress-counted');
     const countedCommentsProgressBar = document.getElementById('card-comments-progress-bar');
@@ -279,13 +279,50 @@ export function onClicked() {
 
     const countedTimeText = document.getElementById('card-comments-progress-time');
     const errorText       = document.getElementById('error');
-    const urlText         = document.getElementById('user_url');
 
     queue.clear();
     queue.start();
     errorText.innerText = '';
 
     const comments = document.getElementById('profile-comments');
+
+    return getCommentsLikes(site, id, (progress) => {
+        if(profile) {
+            progress                   = Math.min(progress, profile.counters.comments);
+            const totalCommentsSeconds = (profile.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
+            comments.innerText         = `Комментариев: ${profile.counters.comments}, обработано ${progress}/${profile.counters.comments}, осталось ${formatTime(totalCommentsSeconds)}`;
+
+            const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
+            countedTimeText.innerText = `${formatTime(totalSeconds)}`;
+        }
+        else {
+            comments.innerText         = `Обработано ${progress}, хз сколько осталось`;
+        }
+    }, (progress) => {
+        totalCommentsText.innerText            = progress.count;
+        countedCommentsText.innerText          = progress.counted;
+        countedCommentsProgressBar.style.width = `${progress.counted * 100 / progress.count}%`;
+
+        countedLikesText.innerText          = `${progress.likes}`;
+        countedDislikesText.innerText       = `${progress.dislikes}`;
+        countedTotalText.innerText          = `${progress.likes + progress.dislikes}`;
+        countedLikesProgressBar.style.width = `${progress.likes * 100 / (progress.likes + progress.dislikes)}%`;
+        const totalSeconds                  = (progress.count - progress.counted) * REQUESTS_DELAY / 1000;
+        countedTimeText.innerText           = `${formatTime(totalSeconds)}`;
+
+        redrawUsers(site, progress.users);
+    }, (_) => {
+        console.warn('Completed');
+    });
+}
+
+export function onClicked() {
+    const errorText = document.getElementById('error');
+    const urlText   = document.getElementById('user_url');
+
+    queue.clear();
+    queue.start();
+    errorText.innerText = '';
 
     const found = USER_REGEX.exec(urlText.value);
     const site  = found[1];
@@ -295,34 +332,12 @@ export function onClicked() {
         .then(profile => {
             fillProfileInfo(profile.result);
 
-            return getCommentsLikes(site, id, (progress) => {
-                progress                   = Math.min(progress, profile.result.counters.comments);
-                const totalCommentsSeconds = (profile.result.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
-                comments.innerText         = `Комментариев: ${profile.result.counters.comments}, обработано ${progress}/${profile.result.counters.comments}, осталось ${formatTime(totalCommentsSeconds)}`;
-
-                const totalSeconds        = profile.result.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
-                countedTimeText.innerText = `${formatTime(totalSeconds)}`;
-
-            }, (progress) => {
-                totalCommentsText.innerText            = progress.count;
-                countedCommentsText.innerText          = progress.counted;
-                countedCommentsProgressBar.style.width = `${progress.counted * 100 / progress.count}%`;
-
-                countedLikesText.innerText          = `${progress.likes}`;
-                countedDislikesText.innerText       = `${progress.dislikes}`;
-                countedTotalText.innerText          = `${progress.likes + progress.dislikes}`;
-                countedLikesProgressBar.style.width = `${progress.likes * 100 / (progress.likes + progress.dislikes)}%`;
-                const totalSeconds                  = (progress.count - progress.counted) * REQUESTS_DELAY / 1000;
-                countedTimeText.innerText           = `${formatTime(totalSeconds)}`;
-
-                redrawUsers(site, progress.users);
-            }, (_) => {
-                console.warn('Completed');
-            });
+            return getInfo(site, id, profile.result);
         })
         .catch(e => {
             console.error(e);
 
-            document.getElementById('error').innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева.`;
+            document.getElementById('error').innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева. А пока попробуем загрузить без профиля.`;
+            getInfo(site, id, null);
         });
 }
