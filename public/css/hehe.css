@@ -1,0 +1,152 @@
+.content {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#user_url {
+    width: 300px;
+}
+
+.profile-ava {
+    width: 30%;
+}
+
+.profile-info {
+    width: 60%;
+}
+
+.profile-ava, .profile-info {
+    padding: 5px;
+    height: 100%;
+    float: left;
+}
+
+#profile-ava {
+    width: 100%;
+    /*height: 64px;*/
+}
+
+.profile-karma-positive {
+    color: #58b132;
+}
+
+.profile-karma-negative {
+    color: #ff402f;
+}
+
+.block-stats {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.block-likers, .block-dislikers {
+    width: calc(50% - 20px);
+    display: inline-table;
+    min-height: 300px;
+    float: left;
+    margin: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    /*font-size: 1em;*/
+}
+
+.block-stat-likes-count {
+    float: right;
+    color: #58b132;
+}
+
+.block-stat-dislikes-count {
+    float: right;
+    color: #ff402f;
+}
+
+.block-stat-name {
+    float: left;
+}
+
+.card-progress, .card-profile, .card-stat {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    height: 150px;
+    float: left;
+}
+
+.card-profile {
+    width: 30%;
+}
+
+.card-progress {
+    width: 32%;
+}
+
+.card-stat {
+    width: 32%;
+}
+
+.card-progress, .card-profile, .card-stat {
+    padding: 1%;
+}
+
+.title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.block-dislikers, .block-likers {
+    font-size: 1.2em;
+}
+
+.stat-record {
+    height: 30px;
+    clear: both;
+}
+
+.card-comments-progress-total-block, .card-comments-progress-counted-block, .card-comments-progress-time-block {
+    width: 33%;
+    float: left;
+    text-align: center;
+}
+
+#card-comments-progress-total, #card-comments-progress-counted {
+    font-weight: bold;
+}
+
+.card-comments-progress-bar-bg {
+    width: 100%;
+    height: 20px;
+    background-color: rgba(107, 107, 107, 0.36);
+    clear: both;
+    border-radius: 25px;
+}
+
+#card-comments-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 25px;
+    background-color: #000000;
+}
+
+.card-likes-progress-likes-block, .card-likes-progress-dislikes-block, .card-likes-progress-total-block {
+    width: 33%;
+    float: left;
+    text-align: center;
+}
+
+#card-likes-progress-total, #card-likes-progress-likes, #card-likes-progress-dislikes {
+    font-weight: bold;
+}
+
+.card-likes-progress-bar-bg {
+    width: 100%;
+    height: 20px;
+    background-color: #ff402f;
+    clear: both;
+    border-radius: 25px;
+}
+
+#card-likes-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 25px;
+    background-color: #58b132;
+}

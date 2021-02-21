@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика лайков на сайте Комитета</title>
+    <script src="src/main.js"></script>
+    <link href="public/css/hehe.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div class="content">
+    <div>
+        <label for="user_url">Ссылка на профиль: </label>
+        <input id="user_url" name="user_url" type="text">
+        <input type="button" value="Go" onclick="onClicked()">
+        <br/> <br/> <br/>
+    </div>
+    <div>
+        <div class="card-profile">
+            <div class="profile-ava">
+                <img id="profile-ava" src="">
+            </div>
+            <div class="profile-info">
+                <a id="profile-name">
+
+                </a>
+                <div id="profile-karma">
+
+                </div>
+                <div id="profile-posts">
+
+                </div>
+                <div id="profile-comments">
+
+                </div>
+            </div>
+        </div>
+        <div class="card-progress">
+            <div>
+                <div class="card-comments-progress-counted-block">
+                    <div>Обработано</div>
+                    <div id="card-comments-progress-counted">0</div>
+                </div>
+                <div class="card-comments-progress-total-block">
+                    <div>Всего</div>
+                    <div id="card-comments-progress-total">0</div>
+                </div>
+                <div class="card-comments-progress-time-block">
+                    <div>Осталось</div>
+                    <div id="card-comments-progress-time">🤔</div>
+                </div>
+            </div>
+            <div>
+                <div class="card-comments-progress-bar-bg">
+                    <div id="card-comments-progress-bar">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-stat">
+            <div>
+                <div class="card-likes-progress-likes-block">
+                    <div>Лайков</div>
+                    <div id="card-likes-progress-likes">0</div>
+                </div>
+                <div class="card-likes-progress-dislikes-block">
+                    <div>Дизлайков</div>
+                    <div id="card-likes-progress-dislikes">0</div>
+                </div>
+                <div class="card-likes-progress-total-block">
+                    <div>Всего</div>
+                    <div id="card-likes-progress-total">0</div>
+                </div>
+            </div>
+            <div>
+                <div class="card-likes-progress-bar-bg">
+                    <div id="card-likes-progress-bar">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block-stats">
+        <div class="block-likers">
+            <div class="title">Топ котят 😊</div>
+            <div id="block-likers"></div>
+        </div>
+        <div class="block-dislikers">
+            <div class="title">Топ хейтеров 😞</div>
+            <div id="block-dislikers"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
