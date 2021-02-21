@@ -106,8 +106,11 @@ async function getCommentsLikes(site, id, onCommentsProgress, onLikesProgress, o
             }));
             offset += comments.result.length;
 
-            onCommentsProgress(totalComments.length);
+            onCommentsProgress(offset);
         } catch (e) {
+            // на некоторые ренжи Очоба 500 возвращает, сколько бы не пробовал
+            // не справляется, видимо, поэтому просто скипаем эти комменты )=
+            offset += COMMENTS_PER_REQUEST;
             console.error('getCommentsLikes: ', e);
         }
 
@@ -293,6 +296,7 @@ export function onClicked() {
             fillProfileInfo(profile.result);
 
             return getCommentsLikes(site, id, (progress) => {
+                progress                   = Math.min(progress, profile.result.counters.comments);
                 const totalCommentsSeconds = (profile.result.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
                 comments.innerText         = `Комментариев: ${profile.result.counters.comments}, обработано ${progress}/${profile.result.counters.comments}, осталось ${formatTime(totalCommentsSeconds)}`;
 
