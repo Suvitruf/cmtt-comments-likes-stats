@@ -4,6 +4,20 @@
     margin-right: auto;
 }
 
+#error {
+    color: red;
+}
+
+ul {
+    margin: 0;
+}
+
+.block-info {
+    position: fixed;
+    right: 10px;
+    width: 300px;
+}
+
 #user_url {
     width: 300px;
 }

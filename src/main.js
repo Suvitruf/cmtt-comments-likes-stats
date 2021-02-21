@@ -2,10 +2,10 @@ import {Queue} from './queue.js';
 
 const MAX_USERS_TO_SHOW    = 1000;
 const COMMENTS_PER_REQUEST = 50;
-const REQUESTS_DELAY       = 400;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
+const REQUESTS_DELAY       = 1000;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
 const REQUEST_COMMENTS_ETA = 3000;  // время выполнения запроса на комменты в районе 1500-4000мс
 const REQUEST_COMMENT_ETA  = 100;   // время выполнения запроса на лайки на комменте в районе 50-200мс
-const USER_REGEX           = /https:\/\/(.*)\/u\/([0-9]*)/g;
+const USER_REGEX           = /https:\/\/(.*)\/u\/([0-9]*)/;
 
 const queue = new Queue({period: REQUESTS_DELAY});
 
@@ -22,6 +22,12 @@ function getCommentLikes(site, id) {
 function getCommentsChunk(site, id, count, offset) {
     return {
         run: async () => fetch(`${getBaseUrl(site)}user/${id}/comments?count=${COMMENTS_PER_REQUEST}&offset=${offset}`)
+    };
+}
+
+function getProfile(site, id) {
+    return {
+        run: async () => fetch(`${getBaseUrl(site)}user/${id}`)
     };
 }
 
@@ -235,11 +241,6 @@ function redrawUsers(site, users) {
     }
 }
 
-async function getProfile(site, id) {
-    const response = await fetch(`${getBaseUrl(site)}user/${id}`);
-
-    return response.json();
-}
 
 function fillProfileInfo(profile) {
     const ava      = document.getElementById('profile-ava');
@@ -274,15 +275,21 @@ export function onClicked() {
     const countedLikesProgressBar = document.getElementById('card-likes-progress-bar');
 
     const countedTimeText = document.getElementById('card-comments-progress-time');
+    const errorText       = document.getElementById('error');
+    const urlText         = document.getElementById('user_url');
+
+    queue.clear();
+    queue.start();
+    errorText.innerText = '';
 
     const comments = document.getElementById('profile-comments');
 
-    const found = USER_REGEX.exec(document.getElementById('user_url').value);
+    const found = USER_REGEX.exec(urlText.value);
     const site  = found[1];
     const id    = found[2];
 
-    getProfile(site, id)
-        .then((profile) => {
+    queue.addTask(getProfile(site, id))
+        .then(profile => {
             fillProfileInfo(profile.result);
 
             return getCommentsLikes(site, id, (progress) => {
@@ -309,6 +316,9 @@ export function onClicked() {
                 console.warn('Completed');
             });
         })
+        .catch(e => {
+            console.error(e);
 
-
+            document.getElementById('error').innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева.`;
+        });
 }

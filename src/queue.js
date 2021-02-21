@@ -8,6 +8,14 @@ const QueueState = {
 const RETRIES        = 5;
 const DELAY_ON_ERROR = 5000;
 
+class CMTTError extends Error {
+    constructor(data) {
+        super(data.message);
+
+        this.data = data;
+    }
+}
+
 export class Queue {
     tasks  = [];
     state  = QueueState.None;
@@ -26,12 +34,16 @@ export class Queue {
 
     startTask = async (task) => {
         let tries = 0;
+        let lastError;
         while (tries < RETRIES) {
             try {
                 const response = await task.run();
 
                 if (response.status >= 400 && response.status < 600) {
-                    throw new Error('Bad response from server: ' + response.status);
+                    throw new CMTTError({
+                        message: 'Bad response from server: ' + response.statusText,
+                        code:    response.status
+                    });
                 }
 
                 switch (this.state) {
@@ -43,6 +55,7 @@ export class Queue {
                 return response.json();
             } catch (e) {
                 this.state = QueueState.Retrying;
+                lastError  = e;
 
                 await this.delay(DELAY_ON_ERROR);
                 tries++;
@@ -51,7 +64,7 @@ export class Queue {
 
         this.state = QueueState.Loading;
 
-        throw new Error('delay on error: to much retires');
+        throw lastError;
     }
 
     checkTasks = () => {
@@ -99,6 +112,11 @@ export class Queue {
             clearInterval(this.timer);
             this.timer = null;
         }
+    }
+
+    clear = () => {
+        this.stop();
+        this.tasks = [];
     }
 
     resume = (force = false) => {
