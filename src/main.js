@@ -1,31 +1,31 @@
+import {Queue} from './queue.js';
+
 const MAX_USERS_TO_SHOW    = 1000;
 const COMMENTS_PER_REQUEST = 50;
-const REQUESTS_DELAY       = 700;   // апишка позволяет 3 в секунду, все мы знаем, что мы знаем, как Очоба работает, да?
-const REQUEST_COMMENTS_ETA = 1500; // время выполнения запроса на комменты в районе 1500-3000мс
-const REQUEST_COMMENT_ETA  = 100; // время выполнения запроса на лайки на комменте в районе 50-200мс
+const REQUESTS_DELAY       = 400;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
+const REQUEST_COMMENTS_ETA = 3000;  // время выполнения запроса на комменты в районе 1500-4000мс
+const REQUEST_COMMENT_ETA  = 100;   // время выполнения запроса на лайки на комменте в районе 50-200мс
 const USER_REGEX           = /https:\/\/(.*)\/u\/([0-9]*)/g;
 
-async function delay() {
-    return new Promise(resolve => setTimeout(resolve, REQUESTS_DELAY));
-}
+const queue = new Queue({period: REQUESTS_DELAY});
 
 function getBaseUrl(site) {
     return `https://api.${site}/v1.8/`
 }
 
-async function getCommentLikes(site, id) {
-    const response = await fetch(`${getBaseUrl(site)}comment/likers/${id}`);
-
-    return response.json();
+function getCommentLikes(site, id) {
+    return {
+        run: async () => fetch(`${getBaseUrl(site)}comment/likers/${id}`)
+    };
 }
 
-async function getCommentsChunk(site, id, count, offset) {
-    const response = await fetch(`${getBaseUrl(site)}user/${id}/comments?count=${COMMENTS_PER_REQUEST}&offset=${offset}`);
-
-    return response.json();
+function getCommentsChunk(site, id, count, offset) {
+    return {
+        run: async () => fetch(`${getBaseUrl(site)}user/${id}/comments?count=${COMMENTS_PER_REQUEST}&offset=${offset}`)
+    };
 }
 
-async function loadLikes(site, comments, onLikesProgress) {
+function loadLikes(site, comments, onLikesProgress, onComplete) {
     const errors     = [];
     const users      = {};
     const totalCount = comments.length;
@@ -34,76 +34,80 @@ async function loadLikes(site, comments, onLikesProgress) {
     let dislikes     = 0;
 
     for (const comment of comments) {
-        try {
-            const commentLikers = await getCommentLikes(site, comment.id);
-            // console.log(commentLikers);
-            if (commentLikers && commentLikers.result) {
-                for (const likerId in commentLikers.result) {
-                    if (!commentLikers.result.hasOwnProperty(likerId))
-                        continue;
-                    if (!users[likerId])
-                        users[likerId] = {
-                            id:       likerId,
-                            likes:    0,
-                            dislikes: 0,
-                            ava:      commentLikers.result[likerId].avatar_url,
-                            name:     commentLikers.result[likerId].name
-                        }
+        queue.addTask(getCommentLikes(site, comment.id))
+            .then(commentLikers => {
+                // console.log(commentLikers);
+                if (commentLikers && commentLikers.result) {
+                    for (const likerId in commentLikers.result) {
+                        if (!commentLikers.result.hasOwnProperty(likerId))
+                            continue;
+                        if (!users[likerId])
+                            users[likerId] = {
+                                id:       likerId,
+                                likes:    0,
+                                dislikes: 0,
+                                ava:      commentLikers.result[likerId].avatar_url,
+                                name:     commentLikers.result[likerId].name
+                            }
 
-                    if (commentLikers.result[likerId].sign === 1) {
-                        users[likerId].likes++;
-                        likes++;
-                    } else {
-                        users[likerId].dislikes++;
-                        dislikes++;
+                        if (commentLikers.result[likerId].sign === 1) {
+                            users[likerId].likes++;
+                            likes++;
+                        } else {
+                            users[likerId].dislikes++;
+                            dislikes++;
+                        }
                     }
                 }
-            }
-        } catch (e) {
-            errors.push({id: comment.id});
-        }
 
-        onLikesProgress({
-            counted: ++counted,
-            count:   totalCount,
-            dislikes,
-            likes,
-            users:   users
-        });
+                onLikesProgress({
+                    counted: ++counted,
+                    count:   totalCount,
+                    dislikes,
+                    likes,
+                    users:   users
+                });
 
-        await delay();
+                if (counted === totalCount) {
+                    if (errors.length)
+                        console.error('errors: ', errors);
+
+                    onComplete(users);
+                }
+            })
+            .catch(e => {
+                console.error('loadLikes: ', e);
+                ++counted
+                errors.push({id: comment.id});
+            });
     }
-
-    if (errors.length)
-        console.error('errors: ', errors);
-
-    return users;
 }
 
 async function getCommentsLikes(site, id, onCommentsProgress, onLikesProgress, onComplete) {
     let offset          = 0;
     const totalComments = [];
     do {
-        const comments = await getCommentsChunk(site, id, COMMENTS_PER_REQUEST, offset);
-        if (!comments || !comments.result || !comments.result.length)
-            break;
+        try {
+            const comments = await queue.addTask(getCommentsChunk(site, id, COMMENTS_PER_REQUEST, offset));
 
-        totalComments.push(...comments.result.map(cmt => {
-            return {
-                id: cmt.id
-            };
-        }));
-        offset += comments.result.length;
+            if (!comments || !comments.result || !comments.result.length)
+                break;
 
-        onCommentsProgress(totalComments.length)
+            totalComments.push(...comments.result.map(cmt => {
+                return {
+                    id: cmt.id
+                };
+            }));
+            offset += comments.result.length;
 
-        await delay();
+            onCommentsProgress(totalComments.length);
+        } catch (e) {
+            console.error('getCommentsLikes: ', e);
+        }
+
     } while (true);
 
-    await delay();
-    const users = await loadLikes(site, totalComments, onLikesProgress);
-
-    onComplete(users);
+    loadLikes(site, totalComments, onLikesProgress, onComplete);
 }
 
 function formatTime(secs) {
@@ -234,8 +238,6 @@ function redrawUsers(site, users) {
 async function getProfile(site, id) {
     const response = await fetch(`${getBaseUrl(site)}user/${id}`);
 
-    await delay();
-
     return response.json();
 }
 
@@ -261,7 +263,7 @@ function fillProfileInfo(profile) {
     comments.innerText = `Комментариев: ${profile.counters.comments}`;
 }
 
-function onClicked() {
+export function onClicked() {
     const totalCommentsText          = document.getElementById('card-comments-progress-total');
     const countedCommentsText        = document.getElementById('card-comments-progress-counted');
     const countedCommentsProgressBar = document.getElementById('card-comments-progress-bar');
@@ -304,7 +306,7 @@ function onClicked() {
 
                 redrawUsers(site, progress.users);
             }, (_) => {
-
+                console.warn('Completed');
             });
         })
 
