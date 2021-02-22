@@ -2,7 +2,7 @@ import {Queue} from './queue.js';
 
 const MAX_USERS_TO_SHOW    = 1000;
 const COMMENTS_PER_REQUEST = 50;
-const REQUESTS_DELAY       = 1000;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
+const REQUESTS_DELAY       = 900;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
 const REQUEST_COMMENTS_ETA = 3000;  // время выполнения запроса на комменты в районе 1500-4000мс
 const REQUEST_COMMENT_ETA  = 100;   // время выполнения запроса на лайки на комменте в районе 50-200мс
 const USER_REGEX           = /https:\/\/(.*)\/u\/([0-9]*)/;
@@ -287,16 +287,15 @@ async function getInfo(site, id, profile) {
     const comments = document.getElementById('profile-comments');
 
     return getCommentsLikes(site, id, (progress) => {
-        if(profile) {
+        if (profile) {
             progress                   = Math.min(progress, profile.counters.comments);
             const totalCommentsSeconds = (profile.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
             comments.innerText         = `Комментариев: ${profile.counters.comments}, обработано ${progress}/${profile.counters.comments}, осталось ${formatTime(totalCommentsSeconds)}`;
 
             const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
             countedTimeText.innerText = `${formatTime(totalSeconds)}`;
-        }
-        else {
-            comments.innerText         = `Обработано ${progress}, хз сколько осталось`;
+        } else {
+            comments.innerText = `Обработано ${progress}, хз сколько осталось`;
         }
     }, (progress) => {
         totalCommentsText.innerText            = progress.count;
@@ -313,6 +312,8 @@ async function getInfo(site, id, profile) {
         redrawUsers(site, progress.users);
     }, (_) => {
         console.warn('Completed');
+
+        queue.clear();
     });
 }
 
@@ -325,8 +326,14 @@ export function onClicked() {
     errorText.innerText = '';
 
     const found = USER_REGEX.exec(urlText.value);
-    const site  = found[1];
-    const id    = found[2];
+    if (!found || !found.length) {
+        errorText.innerText = 'Кривая ссылка';
+
+        return;
+    }
+
+    const site = found[1];
+    const id   = found[2];
 
     queue.addTask(getProfile(site, id))
         .then(profile => {
@@ -337,7 +344,7 @@ export function onClicked() {
         .catch(e => {
             console.error(e);
 
-            document.getElementById('error').innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева. А пока попробуем загрузить без профиля.`;
+            errorText.innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева. А пока попробуем загрузить без профиля.`;
             getInfo(site, id, null);
         });
 }

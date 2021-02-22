@@ -9,23 +9,33 @@
     <link href="public/css/hehe.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description"  content="Статистика лайков на комментариях выбранного участника" />
-    <meta name="keywords"  content="dtf,комитет,статистика,лайки" />
-    <link rel="canonical" href="https://suvitruf.ru/cmtt/comments-likes-stats/" />
-    <meta property="og:title" content="Статистика лайков на сайте Комитета" />
-    <meta property="og:type" content="service" />
-    <meta property="og:url" content="https://suvitruf.ru/cmtt/comments-likes-stats/" />
-    <meta property="og:image" content="https://suvitruf.ru/cmtt/comments-likes-stats/public/img/likes-stats.png" />
-    <meta property="og:site_name" content="Suvitruf's Blog :: Gamedev suffering" />
-    <meta property="og:description" content="Статистика лайков на комментариях выбранного участника" />
-    <meta property="article:published_time" content="2021-02-21T15:10:00Z" />
-    <meta property="article:modified_time" content="2021-02-21T15:10:00Z" />
+    <meta name="description" content="Статистика лайков на комментариях выбранного участника"/>
+    <meta name="keywords" content="dtf,комитет,статистика,лайки"/>
+    <link rel="canonical" href="https://suvitruf.ru/cmtt/comments-likes-stats/"/>
+    <meta property="og:title" content="Статистика лайков на сайте Комитета"/>
+    <meta property="og:type" content="service"/>
+    <meta property="og:url" content="https://suvitruf.ru/cmtt/comments-likes-stats/"/>
+    <meta property="og:image" content="https://suvitruf.ru/cmtt/comments-likes-stats/public/img/likes-stats.png"/>
+    <meta property="og:site_name" content="Suvitruf's Blog :: Gamedev suffering"/>
+    <meta property="og:description" content="Статистика лайков на комментариях выбранного участника"/>
+    <meta property="article:published_time" content="2021-02-21T15:10:00Z"/>
+    <meta property="article:modified_time" content="2021-02-22T20:44:00Z"/>
 </head>
 <body>
 <script type="module">
     import {onClicked} from './src/main.js';
 
-    document.getElementById('go_go_go').onclick = onClicked;
+    function onStart() {
+        onClicked();
+    }
+
+    document.getElementById('go_go_go').onclick = onStart;
+    document.getElementById('user_url').addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            onStart();
+        }
+    });
 </script>
 <div class="block-info" style="transform: translateY(-200px);">
     <div class="block-info-main">
@@ -35,9 +45,9 @@
         <div>
             Поддержать подобные проекты и выход статей можно одним из способов:
             <ul>
-                <li><a href="https://www.patreon.com/suvitruf"  target="_blank">На Патреоне</a>.</li>
-                <li><a href="https://www.paypal.com/paypalme/suvitruf"  target="_blank">Напрямую на Paypal</a>.</li>
-                <li><a href="https://yoomoney.ru/to/41001674710054"  target="_blank">Через Яндекс.Деньги</a>.</li>
+                <li><a href="https://www.patreon.com/suvitruf" target="_blank">На Патреоне</a>.</li>
+                <li><a href="https://www.paypal.com/paypalme/suvitruf" target="_blank">Напрямую на Paypal</a>.</li>
+                <li><a href="https://yoomoney.ru/to/41001674710054" target="_blank">Через Яндекс.Деньги</a>.</li>
             </ul>
         </div>
     </div>
