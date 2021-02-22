@@ -5,7 +5,9 @@
     <title>Статистика лайков на сайте Комитета</title>
     <script src="src/queue.js" type="module"></script>
     <script src="src/main.js" type="module"></script>
+    <script src="src/interactions.js" type="module"></script>
     <link href="public/css/hehe.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta name="description"  content="Статистика лайков на комментариях выбранного участника" />
     <meta name="keywords"  content="dtf,комитет,статистика,лайки" />
@@ -25,30 +27,40 @@
 
     document.getElementById('go_go_go').onclick = onClicked;
 </script>
-<div class="block-info">
-    <div>
-        Вся эта шляпа доступна на <a href="https://github.com/Suvitruf/cmtt-comments-likes-stats" target="_blank">Гитхабе</a>.
+<div class="block-info" style="transform: translateY(-200px);">
+    <div class="block-info-main">
+        <div>
+            Вся эта шляпа доступна на <a href="https://github.com/Suvitruf/cmtt-comments-likes-stats" target="_blank">Гитхабе</a>.
+        </div>
+        <div>
+            Поддержать подобные проекты и выход статей можно одним из способов:
+            <ul>
+                <li><a href="https://www.patreon.com/suvitruf"  target="_blank">На Патреоне</a>.</li>
+                <li><a href="https://www.paypal.com/paypalme/suvitruf"  target="_blank">Напрямую на Paypal</a>.</li>
+                <li><a href="https://yoomoney.ru/to/41001674710054"  target="_blank">Через Яндекс.Деньги</a>.</li>
+            </ul>
+        </div>
     </div>
-    <div>
-        Поддержать подобные проекты и выход статей можно одним из способов:
-        <ul>
-            <li><a href="https://www.patreon.com/suvitruf"  target="_blank">На Патреоне</a>.</li>
-            <li><a href="https://www.paypal.com/paypalme/suvitruf"  target="_blank">Напрямую на Paypal</a>.</li>
-            <li><a href="https://yoomoney.ru/to/41001674710054"  target="_blank">Через Яндекс.Деньги</a>.</li>
-        </ul>
+    <div class="toggle-show-info" id="toggle-show-info">
+        <p class="toggle-show-text">
+            Поддержать
+        </p>
     </div>
 </div>
 <div class="content">
-    <div>
-        <label for="user_url">Ссылка на профиль: </label>
-        <input id="user_url" name="user_url" type="text">
-        <input type="button" value="Go" id="go_go_go">
-        <br/> <br/> <br/>
+    <div class="input-container">
+        <label for="user_url">
+            <span>Ссылка на профиль:</span>
+            <div class="type-container">
+                <input id="user_url" name="user_url" type="text">
+                <input type="button" value="Go" id="go_go_go">
+            </div>
+        </label>
     </div>
     <div>
         <span id="error"></span>
     </div>
-    <div>
+    <div class="top-cards-container">
         <div class="card-profile">
             <div class="profile-ava">
                 <img id="profile-ava" src="">
@@ -69,17 +81,17 @@
             </div>
         </div>
         <div class="card-progress">
-            <div>
+            <div class="card-comments-container">
                 <div class="card-comments-progress-counted-block">
-                    <div>Обработано</div>
+                    <div class="stat-label">Обработано</div>
                     <div id="card-comments-progress-counted">0</div>
                 </div>
                 <div class="card-comments-progress-total-block">
-                    <div>Всего</div>
+                    <div class="stat-label">Всего</div>
                     <div id="card-comments-progress-total">0</div>
                 </div>
                 <div class="card-comments-progress-time-block">
-                    <div>Осталось</div>
+                    <div class="stat-label">Осталось</div>
                     <div id="card-comments-progress-time">🤔</div>
                 </div>
             </div>
@@ -92,17 +104,17 @@
             </div>
         </div>
         <div class="card-stat">
-            <div>
+            <div class="card-likes-container">
                 <div class="card-likes-progress-likes-block">
-                    <div>Лайков</div>
+                    <div class="stat-label">Лайков</div>
                     <div id="card-likes-progress-likes">0</div>
                 </div>
                 <div class="card-likes-progress-dislikes-block">
-                    <div>Дизлайков</div>
+                    <div class="stat-label">Дизлайков</div>
                     <div id="card-likes-progress-dislikes">0</div>
                 </div>
                 <div class="card-likes-progress-total-block">
-                    <div>Всего</div>
+                    <div class="stat-label">Всего</div>
                     <div id="card-likes-progress-total">0</div>
                 </div>
             </div>

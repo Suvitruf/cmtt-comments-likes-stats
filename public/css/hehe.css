@@ -1,7 +1,127 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
+div {
+    overflow: visible;
+}
+
+
+
+@media screen and (max-width: 550px) {
+    .block-dislikers .title,
+    .block-likers .title {
+        font-size: 1.2em;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .block-dislikers .title,
+    .block-likers .title {
+        font-size: 0.9em;
+    }
+    body .block-info {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 900px) {
+    body .content {
+        margin-top: 35px;
+        width: 100%;
+        padding: 10px;
+    }
+
+    #toggle-show-info {
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .type-container {
+        display: flex;
+        height: 30px;
+        padding: 3px;
+    }
+
+    .top-cards-container {
+        flex-wrap: wrap;
+    }
+
+    .top-cards-container .card-profile {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .top-cards-container .card-progress,
+    .top-cards-container .card-stat {
+        width: calc(50% - 20px);
+    }
+
+    #user_url {
+        height: 100%;
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    #go_go_go {
+        height: 100%;
+        width: 50px;
+    }
+
+    .card-comments-container,
+    .card-likes-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .card-likes-container,
+    .card-comments-container {
+        margin-bottom: 10px;
+    }
+
+    .card-comments-container .card-comments-progress-counted-block,
+    .card-comments-container .card-comments-progress-total-block,
+    .card-comments-container .card-comments-progress-time-block,
+    .card-likes-container .card-likes-progress-likes-block,
+    .card-likes-container .card-likes-progress-dislikes-block,
+    .card-likes-container .card-likes-progress-total-block {
+        display: flex;
+        width: 100%;
+    }
+
+    .stat-label {
+        margin-right: 5px;
+    }
+
+    #block-likers .stat-record,
+    #block-dislikers .stat-record {
+        height: auto;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .block-stat-likes-count,
+    .block-stat-dislikes-count {
+        min-width: 25px;
+    }
+}
+
 .content {
-    width: 60%;
+    width: 900px;
     margin-left: auto;
     margin-right: auto;
+    padding: 8px;
+    margin-top: 20px;
 }
 
 #error {
@@ -14,18 +134,56 @@ ul {
 
 .block-info {
     position: fixed;
-    right: 10px;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    right: 0;
     width: 300px;
+    background: white;
+    justify-content: space-between;
+    transform: translateY(-160px);
+    transition: transform 500ms ease-in-out;
+}
+
+.block-info .show {
+    transform: translateY(0);
+}
+
+.block-info-main {
+    padding: 5px;
+}
+
+.toggle-show-info {
+    background-color: rgb(196, 196, 196);
+    height: 20px;
+}
+
+.toggle-show-info:hover {
+   cursor: pointer;
+}
+
+.toggle-show-text {
+    text-align: center;
 }
 
 #user_url {
     width: 300px;
 }
 
+.top-cards-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 .profile-ava {
     width: 30%;
 }
 
+#profile-ava {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 .profile-info {
     width: 60%;
 }
@@ -38,7 +196,6 @@ ul {
 
 #profile-ava {
     width: 100%;
-    /*height: 64px;*/
 }
 
 .profile-karma-positive {
@@ -50,6 +207,8 @@ ul {
 }
 
 .block-stats {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
     margin-top: 30px;
 }
@@ -59,10 +218,8 @@ ul {
     display: inline-table;
     min-height: 300px;
     float: left;
-    margin: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     padding: 5px;
-    /*font-size: 1em;*/
 }
 
 .block-stat-likes-count {
@@ -81,7 +238,7 @@ ul {
 
 .card-progress, .card-profile, .card-stat {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    height: 150px;
+    height: 160px;
     float: left;
 }
 
