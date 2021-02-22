@@ -99,7 +99,7 @@ async function getCommentsLikes(site, id, onCommentsProgress, onLikesProgress, o
             if (!comments || !comments.result || !comments.result.length)
                 break;
 
-            totalComments.push(...comments.result.map(cmt => {
+            totalComments.push(...comments.result.filter(cmt => cmt.likes.count).map(cmt => {
                 return {
                     id: cmt.id
                 };
