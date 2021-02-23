@@ -323,3 +323,30 @@ ul {
     border-radius: 25px;
     background-color: #58b132;
 }
+@media (prefers-color-scheme: dark) {
+        body
+        {
+            background-color: #1b1b1b;
+            color: #bfbfbf;
+        }
+        .card-progress, .card-profile, .card-stat, .block-likers, .block-dislikers, input, .block-info, .toggle-show-info
+        {
+            background-color: #292929
+        }
+        input:focus
+        {
+            background-color: #000;
+        }
+        input
+        {
+            border: 1px solid #fef7cf;
+        }
+        input, a:hover, .toggle-show-info:hover
+        {
+            color: #fef7cf;
+        }
+        a
+        {
+            color: #c9e7f2;
+        }
+    }
