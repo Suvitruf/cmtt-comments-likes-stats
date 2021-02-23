@@ -5,12 +5,12 @@ const COMMENTS_PER_REQUEST = 50;
 const REQUESTS_DELAY       = 900;   // апишка позволяет 3 в секунду. Но все мы знаем, как Очоба работает, да?
 const REQUEST_COMMENTS_ETA = 3000;  // время выполнения запроса на комменты в районе 1500-4000мс
 const REQUEST_COMMENT_ETA  = 100;   // время выполнения запроса на лайки на комменте в районе 50-200мс
-const USER_REGEX           = /https:\/\/(.*)\/u\/([0-9]*)/;
+const USER_REGEX           = /(https\:\/\/)?(dtf\.ru|vc\.ru|tjournal\.ru)\/u\/(\d+)/;
 
 const queue = new Queue({period: REQUESTS_DELAY});
 
 function getBaseUrl(site) {
-    return `https://api.${site}/v1.8/`
+    return `https://api.${site}/v1.9/`
 }
 
 function getCommentLikes(site, id) {
@@ -290,7 +290,7 @@ async function getInfo(site, id, profile) {
         if (profile) {
             progress                   = Math.min(progress, profile.counters.comments);
             const totalCommentsSeconds = (profile.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
-            comments.innerText         = `Комментариев: ${profile.counters.comments}, обработано ${progress}/${profile.counters.comments}, осталось ${formatTime(totalCommentsSeconds)}`;
+            comments.innerText         = `Комментариев: ${profile.counters.comments}\nОбработано: ${progress}/${profile.counters.comments}`;
 
             const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
             countedTimeText.innerText = `${formatTime(totalSeconds)}`;
@@ -332,8 +332,8 @@ export function onClicked() {
         return;
     }
 
-    const site = found[1];
-    const id   = found[2];
+    const site = found[2];
+    const id   = found[3];
 
     queue.addTask(getProfile(site, id))
         .then(profile => {
