@@ -89,7 +89,7 @@ color: var(--black-color) ;
     margin: 0;
     padding: 6px 20px;
     border-right: var(--main-bg-color) solid 2px;
-    box-shadow: var(--black-color) 2px 0px ;
+    /*box-shadow: var(--black-color) 2px 0px ; */
     border-radius: 1px;
 }
 
