@@ -250,7 +250,7 @@ function fillProfileInfo(profile) {
     const name     = document.getElementById('profile-name');
     const karma    = document.getElementById('profile-karma');
     const posts    = document.getElementById('profile-posts');
-    const comments = document.getElementById('profile-comments');
+    const comments = document.getElementById('total-comments');
 
     ava.src = profile.avatar_url;
 
