@@ -102,6 +102,11 @@ color: var(--black-color) ;
     padding-top: 8px;
 }
 
+#error{
+    color:red;
+    text-align: center;
+}
+
 #cards{
     max-width: 1200px;
     display: flex;
@@ -114,7 +119,7 @@ color: var(--black-color) ;
     box-shadow: var(--black-color) 1px 1px 1px;
     border: var(--black-color) 1px solid; 
     margin: 0px 15px;
-    width: 40%;
+    width: 45%;
     height: 175px;
     font-size: 20px;
     padding: 5px;
