@@ -103,8 +103,9 @@ color: var(--black-color) ;
 }
 
 #error{
-    color:red;
-    text-align: center;
+    color: red;
+    margin: 10px 0px;
+    font-size: 22px;
 }
 
 #cards{
