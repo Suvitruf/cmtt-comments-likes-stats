@@ -160,8 +160,8 @@ function addUser(user, fieldName, list) {
 }
 
 function redrawUsers(site, users) {
-    const blockLikers        = document.getElementById('block-likers');
-    const blockDislikers     = document.getElementById('block-dislikers');
+    const blockLikers        = document.getElementById('likers-list');
+    const blockDislikers     = document.getElementById('dislikers-list');
     blockLikers.innerHTML    = '';
     blockDislikers.innerHTML = '';
 
@@ -250,7 +250,7 @@ function fillProfileInfo(profile) {
     const name     = document.getElementById('profile-name');
     const karma    = document.getElementById('profile-karma');
     const posts    = document.getElementById('profile-posts');
-    const comments = document.getElementById('profile-comments');
+    const comments = document.getElementById('total-comments');
 
     ava.src = profile.avatar_url;
 
@@ -284,14 +284,15 @@ async function getInfo(site, id, profile) {
     queue.start();
     errorText.innerText = '';
 
-    const comments = document.getElementById('profile-comments');
+    const totalComments = document.getElementById('total-comments');
+    const parsedComments = document.getElementById('parsed-comments');
 
     return getCommentsLikes(site, id, (progress) => {
         if (profile) {
             progress                   = Math.min(progress, profile.counters.comments);
             const totalCommentsSeconds = (profile.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
-            comments.innerText         = `Комментариев: ${profile.counters.comments}\nОбработано: ${progress}/${profile.counters.comments}`;
-
+            totalComments.innerText    = `Комментариев: ${profile.counters.comments}`;
+            parsedComments.innerText   = `Обработано: ${progress}/${profile.counters.comments}`
             const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
             countedTimeText.innerText = `${formatTime(totalSeconds)}`;
         } else {
@@ -319,7 +320,7 @@ async function getInfo(site, id, profile) {
 
 export function onClicked() {
     const errorText = document.getElementById('error');
-    const urlText   = document.getElementById('user_url');
+    const urlText   = document.getElementById('search-input');
 
     queue.clear();
     queue.start();
