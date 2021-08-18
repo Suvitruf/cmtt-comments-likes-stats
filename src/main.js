@@ -185,7 +185,7 @@ function redrawUsers(site, users) {
     for (let i = 0; i < Math.min(MAX_USERS_TO_SHOW, likers.length); ++i) {
         const user      = likers[i];
         const userLiker = document.createElement('div');
-        userLiker.classList.add('stat-record');
+        userLiker.classList.add('block-stat-record');
 
 
         const userLikerNameBlock = document.createElement('div');
@@ -216,7 +216,7 @@ function redrawUsers(site, users) {
     for (let i = 0; i < Math.min(MAX_USERS_TO_SHOW, dislikers.length); ++i) {
         const user         = dislikers[i];
         const userDisliker = document.createElement('div');
-        userDisliker.classList.add('stat-record');
+        userDisliker.classList.add('block-stat-record');
 
         const userDislikerNameBlock = document.createElement('div');
         userDislikerNameBlock.classList.add('block-stat-name');
