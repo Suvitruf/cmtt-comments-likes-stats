@@ -296,7 +296,7 @@ async function getInfo(site, id, profile) {
             const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
             countedTimeText.innerText = `${formatTime(totalSeconds)}`;
         } else {
-            comments.innerText = `Обработано ${progress}, хз сколько осталось`;
+            parsedComments.innerText   = `Обработано: ${progress}, не ясно, сколько осталось`;
         }
     }, (progress) => {
         totalCommentsText.innerText            = progress.count;
