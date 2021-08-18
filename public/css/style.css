@@ -1,32 +1,35 @@
 @import url("normalize.css");
 
-*{
+* {
     --main-fg-color: #1b2a8b;
     --main-bg-color: #FFFFFF;
     --black-color: #28262C;
     --positive-color: #24ce65;
     --negative-color: #e24a3c;
 }
-html{
+
+html {
     -webkit-font-smoothing: antialiased;
     max-width: 100%;
-    background-color:var(--main-bg-color);
-    font-family:  'Roboto', Arial, Helvetica, sans-serif;
+    background-color: var(--main-bg-color);
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
     font-size: 22px;
 
 }
-main{
+
+main {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex-flow: column;
-   
+
 }
-a{
+
+a {
     text-decoration: underline;
 }
 
-header{
+header {
     background-color: var(--main-fg-color);
     padding: 25px 40px;
     width: 100%;
@@ -35,55 +38,60 @@ header{
     align-items: center;
     flex-direction: row;
 }
-#logo{
+
+#logo {
     color: var(--main-bg-color);
     font-weight: bold;
     font-size: 40px;
     padding: 0 20px;
     text-shadow: var(--black-color) 2px 2px;
 }
-#search{
+
+#search {
     display: flex;
     justify-content: center;
     text-align: center;
     flex-flow: row;
     display: inline;
-    
+
 }
-#search-label{
+
+#search-label {
     color: var(--main-bg-color);
     text-shadow: var(--black-color) 2px 2px;
     font-size: 22px
 }
-#search-input{
-width: 300px;
-border: var(--black-color) 1px solid;
-background-color: var(--main-bg-color);
-border-radius: 5px;
-font-size: 20px;
-margin: 0px 10px;
-padding: 3px;
-color: var(--black-color) ;
+
+#search-input {
+    width: 300px;
+    border: var(--black-color) 1px solid;
+    background-color: var(--main-bg-color);
+    border-radius: 5px;
+    font-size: 20px;
+    margin: 0px 10px;
+    padding: 3px;
+    color: var(--black-color);
 }
 
-#search-button{
+#search-button {
     border: var(--black-color) 1px solid;
     border-radius: 5px;
     font-size: 23px;
     padding: 2px 5px;
     background-color: var(--main-bg-color);
 }
-#search-button:hover{
+
+#search-button:hover {
     background-color: #DDD;
 }
 
-#urls{
+#urls {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.url-image{
+.url-image {
     color: var(--main-bg-color);
     min-height: 31px;
     margin: 0;
@@ -93,22 +101,22 @@ color: var(--black-color) ;
     border-radius: 1px;
 }
 
-.url-image:last-child{
+.url-image:last-child {
     border-right: none;
     box-shadow: none;
 }
 
-#paypal-logo{
+#paypal-logo {
     padding-top: 8px;
 }
 
-#error{
+#error {
     color: red;
     margin: 10px 0px;
     font-size: 22px;
 }
 
-#cards{
+#cards {
     max-width: 1200px;
     display: flex;
     justify-content: center;
@@ -116,12 +124,13 @@ color: var(--black-color) ;
     margin-top: 20px;
 
 }
-.card{
-    box-shadow: var(--black-color) 1px 1px 1px;
-    border: var(--black-color) 1px solid; 
-    margin: 0px 15px;
-    width: 45%;
-    height: 175px;
+
+.card {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    border: var(--black-color) 1px solid;
+    margin: 20px 10px;
+    width: 450px;
+    height: 185px;
     font-size: 20px;
     padding: 5px;
 }
@@ -150,11 +159,11 @@ color: var(--black-color) ;
     width: 60%;
 }
 
-.profile-datum{
+.profile-datum {
     margin: 5px 0px;
 }
 
-#profile-name{
+#profile-name {
     color: var(--black-color);
     font-size: 26px;
     text-decoration: none;
@@ -168,20 +177,21 @@ color: var(--black-color) ;
     color: var(--negative-color);
 }
 
-#total-comments{
+#total-comments {
     margin-bottom: 5px;
 }
 
 
-
-
-
-#card-progress{
+#card-progress {
     padding: 10px;
 }
 
-.card-bar{
-    margin-bottom: 15px;
+.card-bar {
+    margin-bottom: 25px;
+}
+
+.card-info-block {
+    padding: 5px;
 }
 
 .card-comments-progress-total-block, .card-comments-progress-counted-block, .card-comments-progress-time-block {
@@ -235,17 +245,16 @@ color: var(--black-color) ;
 }
 
 
-
-#blocks{
+#blocks {
     max-width: 1200px;
-    margin-top: 25px;
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
     flex-direction: row;
 }
-.block{
-    box-shadow: var(--black-color) 1px 1px 1px;
+
+.block {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     border: var(--black-color) 1px solid;
     width: 450px;
     margin: 20px 10px;
@@ -254,16 +263,16 @@ color: var(--black-color) ;
     height: 100%;
 }
 
-.block-header{
+.block-header {
     background-color: var(--main-bg-color);
     font-size: 30px;
     padding: 0;
     display: flex;
-   justify-content: center;
-   padding:10px 0px 20px;
+    justify-content: center;
+    padding: 10px 0px 20px;
 }
 
-.block-stat-record{
+.block-stat-record {
     display: flex;
     justify-content: space-between;
     font-size: 22px;
@@ -286,183 +295,199 @@ color: var(--black-color) ;
     float: left;
 }
 
-.block-stat-name span a{
+.block-stat-name span a {
     color: var(--main-fg-color);
     text-decoration: none;
 }
 
-.block-stat-name span a:visited{
+.block-stat-name span a:visited {
     color: var(--main-fg-color)
 }
 
-.block-stat-name span a:hover{
+.block-stat-name span a:hover {
     color: var(--black-color)
 }
 
-@media screen and (max-width: 1300px){
-    header{
+@media screen and (max-width: 1300px) {
+    header {
         flex-direction: column;
     }
-    #logo{
-        order:1;
+
+    #logo {
+        order: 1;
         font-size: 44px;
     }
-    #search{
 
-        order:3;
+    #search {
+
+        order: 3;
     }
-    #urls{
+
+    #urls {
         order: 2;
         margin: 30px 0;
     }
 
 }
 
-@media screen and (max-width:950px){
-    .block{
+@media screen and (max-width: 950px) {
+    .block {
         width: 350px;
     }
-    #cards{
+
+    #cards {
         flex-direction: column;
         align-items: center;
     }
-    .card{
+
+    .card {
         width: 400px;
     }
-    #card-progress{
+
+    #card-progress {
         margin-top: 20px;
     }
 }
 
-@media screen and (max-width:750px) {
-    .block-stat-record{
+@media screen and (max-width: 750px) {
+    .block-stat-record {
         justify-content: space-between;
         padding: 8px 0px;
     }
 
-    #blocks{
+    #blocks {
         margin-top: 10px;
     }
 
 
-    .block{
+    .block {
         width: 300px;
     }
 
-    .block-header{
+    .block-header {
         padding: 5px 0 15px;
     }
-    
+
 }
 
 @media screen and (max-width: 684px) {
-    #search{
+    #search {
         display: flex;
         align-items: center;
         flex-direction: column;
     }
 
-    #search-label{
+    #search-label {
         font-size: 25px;
     }
-    #search-input{
+
+    #search-input {
         margin: 13px 0;
         padding: 6px 8px;
     }
-    
-    #search-button{
+
+    #search-button {
         padding: 9px 9px;
         width: 150px;
     }
 }
 
-@media screen and (max-width:644px){
-    .block{
-        width:275px;
+@media screen and (max-width: 644px) {
+    .block {
+        width: 275px;
     }
-    .block-header{
+
+    .block-header {
         font-size: 25px;
     }
-    .block-stat-record{
+
+    .block-stat-record {
         font-size: 20px;
         width: 100%;
     }
-    .block-stat-name{
+
+    .block-stat-name {
         padding: 0 2px;
     }
 }
 
-@media screen and (max-width:600px){
-    .block{
-        width:250px;
+@media screen and (max-width: 600px) {
+    .block {
+        width: 250px;
         padding: 0px 3px;
     }
-    .block-stat-name{
+
+    .block-stat-name {
         font-size: 18px;
         text-align: center;
     }
 }
 
-@media screen and (max-width:533px){
-    .block{
-        width:215px;
-        margin:10px 5px;
+@media screen and (max-width: 533px) {
+    .block {
+        width: 215px;
+        margin: 10px 5px;
         padding: 0px 0px;
     }
-    
+
 }
 
 
-@media screen and (max-width:455px) {
-    .block{
-        width:200px;
+@media screen and (max-width: 455px) {
+    .block {
+        width: 200px;
     }
-    .block-header{
+
+    .block-header {
         font-size: 24px;
     }
 
-    .block-stat-name{
+    .block-stat-name {
         font-size: 18px;
     }
-    
+
 }
 
-@media screen and (max-width:417px){
-    .card{
+@media screen and (max-width: 417px) {
+    .card {
         width: 355px;
         font-size: 19px;
         padding: 5px 0;
     }
-    .block-header{
+
+    .block-header {
         font-size: 22px;
     }
-    .block{
-        width:180px;
+
+    .block {
+        width: 180px;
     }
 
-    .block-stat-record{
+    .block-stat-record {
         font-size: 17px;
         display: flex;
         justify-content: space-between;
     }
-    
+
 }
 
-@media screen and (max-width:390px) {
-    #urls{
+@media screen and (max-width: 390px) {
+    #urls {
         width: 350px;
     }
-    
+
 }
 
-@media screen and (max-width:373px) {
-    main{
+@media screen and (max-width: 373px) {
+    main {
         width: 100vw;
     }
-    #blocks{
+
+    #blocks {
         width: 100vw;
     }
-    .block{
+
+    .block {
         margin: 10px 0px;
     }
 }
