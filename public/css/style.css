@@ -52,16 +52,15 @@ header {
     justify-content: center;
     text-align: center;
     flex-flow: row;
-    display: inline;
-
+    /*display: inline;*/
 }
 
-#search-label {
+.search-label {
     color: var(--main-bg-color);
-    font-size: 22px
+    font-size: 22px;
 }
 
-#search-input {
+#search-input, #search-cookie {
     width: 300px;
     border: var(--black-color) 1px solid;
     background-color: var(--main-bg-color);
@@ -375,6 +374,11 @@ header {
     }
 
     #search-input {
+        margin: 13px 0;
+        padding: 6px 8px;
+    }
+
+    #search-cookie {
         margin: 13px 0;
         padding: 6px 8px;
     }

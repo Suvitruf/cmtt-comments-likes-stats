@@ -10,28 +10,37 @@ const USER_REGEX           = /(https\:\/\/)?(dtf\.ru|vc\.ru|tjournal\.ru)\/u\/(\
 const queue = new Queue({period: REQUESTS_DELAY});
 
 function getBaseUrl(site) {
-    return `https://api.${site}/v1.9/`
+    return `https://api.${site}/v2.31/`
 }
 
-function getCommentLikes(site, id) {
+function getCommentLikes(site, id, cookieKey) {
+    if (cookieKey) {
+        return {
+            run: async () => fetch(`https://${site}/vote/get_likers?id=${id}&type=4&mode=raw`, {
+                headers: {
+                    Cookie: `osnova-remember=${cookieKey}`
+                }
+            })
+        }
+    }
     return {
         run: async () => fetch(`${getBaseUrl(site)}comment/likers/${id}`)
     };
 }
 
-function getCommentsChunk(site, id, count, offset) {
+function getCommentsChunk(site, id, lastId, lastSorting) {
     return {
-        run: async () => fetch(`${getBaseUrl(site)}user/${id}/comments?count=${COMMENTS_PER_REQUEST}&offset=${offset}`)
+        run: async () => fetch(`${getBaseUrl(site)}comments?subsiteId=${id}&sorting=date${lastId ? (`&lastId=${lastId}&lastSortingValue=${lastSorting}`) : ''}`)
     };
 }
 
 function getProfile(site, id) {
     return {
-        run: async () => fetch(`${getBaseUrl(site)}user/${id}`)
+        run: async () => fetch(`${getBaseUrl(site)}subsite?id=${id}`)
     };
 }
 
-function loadLikes(site, comments, onLikesProgress, onComplete) {
+function loadLikes(site, comments, cookieKey, onLikesProgress, onComplete) {
     const errors     = [];
     const users      = {};
     const totalCount = comments.length;
@@ -40,28 +49,54 @@ function loadLikes(site, comments, onLikesProgress, onComplete) {
     let dislikes     = 0;
 
     for (const comment of comments) {
-        queue.addTask(getCommentLikes(site, comment.id))
+        queue.addTask(getCommentLikes(site, comment.id, cookieKey))
             .then(commentLikers => {
-                // console.log(commentLikers);
-                if (commentLikers && commentLikers.result) {
-                    for (const likerId in commentLikers.result) {
-                        if (!commentLikers.result.hasOwnProperty(likerId))
-                            continue;
-                        if (!users[likerId])
-                            users[likerId] = {
-                                id:       likerId,
-                                likes:    0,
-                                dislikes: 0,
-                                ava:      commentLikers.result[likerId].avatar_url,
-                                name:     commentLikers.result[likerId].name
-                            }
+                if (cookieKey) {
+                    // запрос с куками не будет из браузера работать
+                    // может позже запилю серверную часть, тогда будет всё ок
+                    // а до тех пор придётся только лайками довольствоваться.
+                    if (commentLikers && commentLikers.data && commentLikers.data.likers) {
+                        const likers = commentLikers.data.likers;
+                        for (const likerId in likers) {
+                            if (!commentLikers.result.hasOwnProperty(likerId))
+                                continue;
+                            if (!users[likerId])
+                                users[likerId] = {
+                                    id:       likerId,
+                                    likes:    0,
+                                    dislikes: 0,
+                                    ava:      likers[likerId].avatar_url,
+                                    name:     likers[likerId].name
+                                }
 
-                        if (commentLikers.result[likerId].sign === 1) {
-                            users[likerId].likes++;
-                            likes++;
-                        } else {
-                            users[likerId].dislikes++;
-                            dislikes++;
+                            if (likers[likerId].type === 1) {
+                                users[likerId].likes++;
+                                likes++;
+                            } else {
+                                users[likerId].dislikes++;
+                                dislikes++;
+                            }
+                        }
+                    }
+                } else {
+                    if (commentLikers && commentLikers.result) {
+                        for (const liker of commentLikers.result) {
+                            if (!users[liker.id])
+                                users[liker.id] = {
+                                    id:       liker.id,
+                                    likes:    0,
+                                    dislikes: 0,
+                                    ava:      getAva(liker.avatar),
+                                    name:     liker.name
+                                }
+
+                            if (liker.type === 1) {
+                                users[liker.id].likes++;
+                                likes++;
+                            } else {
+                                users[liker.id].dislikes++;
+                                dislikes++;
+                            }
                         }
                     }
                 }
@@ -89,34 +124,42 @@ function loadLikes(site, comments, onLikesProgress, onComplete) {
     }
 }
 
-async function getCommentsLikes(site, id, onCommentsProgress, onLikesProgress, onComplete) {
-    let offset          = 0;
-    const totalComments = [];
+async function getCommentsLikes(site, id, cookieKey, onCommentsProgress, onLikesProgress, onComplete) {
+    let loadedItemsCount = 0;
+    const totalComments  = [];
+    let lastId           = undefined;
+    let lastSortingValue = undefined;
     do {
         try {
-            const comments = await queue.addTask(getCommentsChunk(site, id, COMMENTS_PER_REQUEST, offset));
+            const comments = await queue.addTask(getCommentsChunk(site, id, lastId, lastSortingValue));
 
-            if (!comments || !comments.result || !comments.result.length)
+            // no items, just leave
+            if (!comments || !comments.result || !comments.result.items || !comments.result.items.length)
                 break;
 
-            totalComments.push(...comments.result.filter(cmt => cmt.likes.count).map(cmt => {
+            const items      = comments.result.items;
+            lastId           = comments.result.lastId;
+            lastSortingValue = comments.result.lastSortingValue;
+
+            totalComments.push(...items.filter(cmt => cmt.likes.counter).map(cmt => {
                 return {
                     id: cmt.id
                 };
             }));
-            offset += comments.result.length;
+            loadedItemsCount += items.length;
 
-            onCommentsProgress(offset);
+            onCommentsProgress(loadedItemsCount);
+
+            // last chunk
+            if (!lastId || !lastSortingValue)
+                break;
         } catch (e) {
-            // на некоторые ренжи Очоба 500 возвращает, сколько бы не пробовал
-            // не справляется, видимо, поэтому просто скипаем эти комменты )=
-            offset += COMMENTS_PER_REQUEST;
             console.error('getCommentsLikes: ', e);
         }
 
     } while (true);
 
-    loadLikes(site, totalComments, onLikesProgress, onComplete);
+    loadLikes(site, totalComments, cookieKey, onLikesProgress, onComplete);
 }
 
 function formatTime(secs) {
@@ -244,6 +287,12 @@ function redrawUsers(site, users) {
     }
 }
 
+function getAva(ava) {
+    switch (ava.type) {
+        case 'image':
+            return `https://leonardo.osnova.io/${ava.data.uuid}/-/scale_crop/200x200/-/format/webp/`;
+    }
+}
 
 function fillProfileInfo(profile) {
     const ava      = document.getElementById('profile-ava');
@@ -252,13 +301,13 @@ function fillProfileInfo(profile) {
     const posts    = document.getElementById('profile-posts');
     const comments = document.getElementById('total-comments');
 
-    ava.src = profile.avatar_url;
+    ava.src = getAva(profile.avatar);
 
     name.innerText = profile.name;
     name.href      = profile.url;
 
-    karma.innerText = `${profile.karma > 0 ? '+' : ''}${profile.karma}`;
-    if (profile.karma >= 0)
+    karma.innerText = `${profile.rating > 0 ? '+' : ''}${profile.rating}`;
+    if (profile.rating >= 0)
         karma.classList.add('profile-karma-positive');
     else
         karma.classList.add('profile-karma-negative');
@@ -267,7 +316,7 @@ function fillProfileInfo(profile) {
     comments.innerText = `Комментариев: ${profile.counters.comments}`;
 }
 
-async function getInfo(site, id, profile) {
+async function getInfo(site, id, profile, cookieKey) {
     const totalCommentsText          = document.getElementById('card-comments-progress-total');
     const countedCommentsText        = document.getElementById('card-comments-progress-counted');
     const countedCommentsProgressBar = document.getElementById('card-comments-progress-bar');
@@ -284,19 +333,19 @@ async function getInfo(site, id, profile) {
     queue.start();
     errorText.innerText = '';
 
-    const totalComments = document.getElementById('total-comments');
+    const totalComments  = document.getElementById('total-comments');
     const parsedComments = document.getElementById('parsed-comments');
 
-    return getCommentsLikes(site, id, (progress) => {
+    return getCommentsLikes(site, id, cookieKey, (loadedItemsCount) => {
         if (profile) {
-            progress                   = Math.min(progress, profile.counters.comments);
-            const totalCommentsSeconds = (profile.counters.comments - progress) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
+            loadedItemsCount           = Math.min(loadedItemsCount, profile.counters.comments);
+            const totalCommentsSeconds = (profile.counters.comments - loadedItemsCount) / COMMENTS_PER_REQUEST * (REQUESTS_DELAY + REQUEST_COMMENTS_ETA) / 1000;
             totalComments.innerText    = `Комментариев: ${profile.counters.comments}`;
-            parsedComments.innerText   = `Обработано: ${progress}/${profile.counters.comments}`
-            const totalSeconds        = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
-            countedTimeText.innerText = `${formatTime(totalSeconds)}`;
+            parsedComments.innerText   = `Обработано: ${loadedItemsCount}/${profile.counters.comments}`
+            const totalSeconds         = profile.counters.comments * (REQUESTS_DELAY + REQUEST_COMMENT_ETA) / 1000 + totalCommentsSeconds;
+            countedTimeText.innerText  = `${formatTime(totalSeconds)}`;
         } else {
-            parsedComments.innerText   = `Обработано: ${progress}, не ясно, сколько осталось`;
+            parsedComments.innerText = `Обработано: ${loadedItemsCount}, не ясно, сколько осталось`;
         }
     }, (progress) => {
         totalCommentsText.innerText            = progress.count;
@@ -321,6 +370,7 @@ async function getInfo(site, id, profile) {
 export function onClicked() {
     const errorText = document.getElementById('error');
     const urlText   = document.getElementById('search-input');
+    const cookieKey = document.getElementById('search-cookie');
 
     queue.clear();
     queue.start();
@@ -338,14 +388,14 @@ export function onClicked() {
 
     queue.addTask(getProfile(site, id))
         .then(profile => {
-            fillProfileInfo(profile.result);
+            fillProfileInfo(profile.result.subsite);
 
-            return getInfo(site, id, profile.result);
+            return getInfo(site, id, profile.result.subsite, cookieKey ? cookieKey.value : null);
         })
         .catch(e => {
             console.error(e);
 
             errorText.innerText = `Произошла какая-то хрень: ${e.message} Если в настройках у вас профиль не скрыт, то пинайте Ширяева. А пока попробуем загрузить без профиля.`;
-            getInfo(site, id, null);
+            getInfo(site, id, null, cookieKey);
         });
 }
